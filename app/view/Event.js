@@ -24,7 +24,8 @@ Ext.define('PTWMobile2014.view.Event', {
 			 '	<h1 class="title">{Title}</h1>', 
 			 '	<tpl if="Address"><p class="address">{Address}</p></tpl>', 
 			 '	<p class="dates">', 
-			 	'<time>{[Ext.DateExtras.getShortMonthName(values.StartTime.getMonth())]} {[values.StartTime.getDate()]} - {[Ext.DateExtras.getShortMonthName(values.EndTime.getMonth())]} {[values.EndTime.getDate()]}, {[values.StartTime.getFullYear()]}</time>', '<br>', '<time>{StartDate:date("g:i A")} to {EndTime:date("g:i A")}</time>', '	</p>', '	<tpl if="Description"><div class="description"><p>{[values.Description.replace(/[\\r\\n]+/g, \'</p><p>\')]}</p></div></tpl>', 
+			 	'<time>{[Ext.DateExtras.getShortMonthName(values.StartTime.getMonth())]} {[values.StartTime.getDate()]} - {[Ext.DateExtras.getShortMonthName(values.EndTime.getMonth())]} {[values.EndTime.getDate()]}, {[values.StartTime.getFullYear()]}</time>', '<br>', '<time>{StartDate:date("g:i A")} to {EndTime:date("g:i A")}</time>', '	</p>', 
+			 	'	<tpl if="Description"><div class="description"><p>{[values.Description.replace(/[\\r\\n]+/g, \'</p><p>\')]}</p></div></tpl>', 
 			 	'	<ul class="event-links">', 
 			 	'		<tpl if="Address"    ><li><a href="http://maps.google.com/?q={Address}" target="_system" class="wtf">Directions</a></li></tpl>',
 			 	'		<tpl if="RegisterURL"><li><a href="{RegisterURL}" target="_blank">Register</a></li></tpl>',
@@ -37,8 +38,13 @@ Ext.define('PTWMobile2014.view.Event', {
 	},
 
 	updateEvent: function(newEvent, oldEvent) {
+		var eventData = newEvent.getData()
+
 		if (newEvent) {
-			this.setData(newEvent.getData());
+			if(markdown && markdown.toHTML) {
+				eventData.Description = markdown.toHTML(eventData.Description);
+			}
+			this.setData(eventData);
 			Jarvus.util.ExternalBrowser.patchTargets(this.getInnerHtmlElement());
 		}
 	}
