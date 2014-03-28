@@ -42,6 +42,12 @@ Ext.define('PTWMobile2014.API', {
 		});
 	},
 
+	loadSchedule: function(lastSync, callback, scope) {
+		var params = { updated_after: lastSync};
+
+		this.request('get', 'events/json', params, callback, scope);
+	},
+
 	onRequestException: function(connection, response, options) {
 		var me = this;
 

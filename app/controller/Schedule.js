@@ -1,7 +1,9 @@
 Ext.define('PTWMobile2014.controller.Schedule', {
-	extend: 'Ext.app.Controller',	
+	extend: 'Ext.app.Controller',
+	requires: ['PTWMobile2014.API'],
 
 	config: {
+		calendarUpdateFrequency: window.calendarUpdateFrequency || 3600, // # of seconds until cached calendar considered old
 		views: ['Main', 'Event'],
 		stores: ['Schedule'],
 		refs: {
@@ -36,10 +38,11 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 	},
 
 	launch: function() {
-		var mainView = this.getMainView(),
-			scheduleStore = Ext.getStore('Schedule');
+		var mainView = this.getMainView();
 
 		Ext.Viewport.add(mainView);
+
+		this.syncSchedule();
 
 		// relay navigation to clicky
 		if (Ext.feature.has.History && window.clicky) {
@@ -47,8 +50,65 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 				clicky.log(ev.newURL, null, 'pageview');
 			});
 		}
+	},
 
-		scheduleStore.load();
+	syncSchedule: function(forceUpdate) {
+		var me = this,
+			scheduleStore = Ext.getStore('Schedule'),
+			lastSync = localStorage.getItem('lastSync'),
+			cachedSchedule = localStorage.getItem('schedule'),
+			now = Date.now() / 1000;
+
+		if (cachedSchedule) {
+			if (!scheduleStore.isLoaded() && (cachedSchedule = Ext.decode(cachedSchedule, true))) {
+				scheduleStore.setData(cachedSchedule);
+				scheduleStore.loaded = true;
+			}
+
+			if (forceUpdate || !lastSync || now - parseInt(lastSync) > me.getCalendarUpdateFrequency()) {
+				me.loadSchedule();
+			}
+		} else {
+			me.loadSchedule();
+		}
+	},
+
+	loadSchedule: function() {
+		var mainView = this.getMainView(),
+			scheduleStore = Ext.getStore('Schedule'),
+			lastSync = localStorage.getItem('lastSync'),
+			i = 0,
+			data, record;
+
+		mainView.setMasked({
+			xtype: 'loadmask',
+			message: 'Loading&hellip;'
+		});
+
+		PTWMobile2014.API.loadSchedule(lastSync, function(options, success, response) {
+			if (success) {
+				data = response.data.data;
+				if (data.length > 0) {
+					for (; i < data.length; i++) {
+						if (record = scheduleStore.getById(data[i].ID)) {
+							record.raw = data[i];
+							record.setData(data[i]);
+							record.setDirty();
+						} else {
+							scheduleStore.addData(data[i]);
+						}
+						scheduleStore.sync();
+					}
+
+					// store response in cache
+					localStorage.setItem('schedule', Ext.encode(scheduleStore.getRange().map(function(v) {
+						return v.raw;
+					})));
+				}
+				localStorage.setItem('lastSync', Math.round(Date.now() / 1000));
+			}
+			mainView.setMasked(false);
+		});
 	},
 
 	onEventListActivate: function() {

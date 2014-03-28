@@ -1,7 +1,7 @@
 Ext.define('PTWMobile2014.store.Schedule', {
 	extend: 'Ext.data.Store',
 	requires: [
-		'PTWMobile2014.model.Event', 'PTWMobile2014.proxy.API'
+		'PTWMobile2014.model.Event'
 	],
 
 	config: {
@@ -12,13 +12,9 @@ Ext.define('PTWMobile2014.store.Schedule', {
             },
             sortProperty: 'StartTime'
         },
-		proxy: {
-			type: 'api',
-			url: 'events/json',
-			reader: {
-				type: 'json',
-				rootProperty: 'data'
-			}
-		}
+		sorters: [{
+			property: 'StartTime',
+			direction: 'ASC'
+		}]
 	}
 });
