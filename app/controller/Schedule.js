@@ -3,7 +3,7 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 	requires: ['PTWMobile2014.API'],
 
 	config: {
-		calendarUpdateFrequency: window.calendarUpdateFrequency || 3600, // # of seconds until cached calendar considered old
+		calendarUpdateFrequency: window.calendarUpdateFrequency || 1, // # of seconds until cached calendar considered old
 		views: ['Main', 'Event'],
 		stores: ['Schedule'],
 		refs: {
