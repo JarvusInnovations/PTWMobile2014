@@ -48,8 +48,34 @@ Ext.application({
     launch: function() {
         // Destroy the #appLoadingIndicator element
         Ext.fly('appLoadingIndicator').destroy();
-    },
 
+        // Fix for an issue on iOS 7.1 when minimal-ui is enabled and phone is in landscape,
+        // where the viewport is moved up in certain situations, see below.
+        // Sencha bug thread: http://www.sencha.com/forum/showthread.php?282632-2.3.1a-quot-minimal-ui-quot-breaks-viewport-position-on-iOS-7.1-when-rotated-to-landscape&p=1033589
+        
+            if (Ext.os.is.iOS && Ext.os.version.gtEq('7')) {
+                // Fix viewport position after orientation change
+                // Applying to all orientation changes just to be sure and since it has low overhead,
+                // but would theoretically only be needed for landscape
+                Ext.Viewport.on('orientationchange', function () {
+                    this.scrollToTop();
+                });
+            
+                // Fix viewport position after field blur and keyboard is hidden when phone is in landscape
+                // CAUTION: The 'control' method is a private method of Ext.app.Application
+                this.control({
+                    'field': {
+                        blur: function () {
+                            if (Ext.Viewport.getOrientation() == 'landscape') {
+                                Ext.Viewport.scrollToTop();
+                            }
+                        }
+                    }
+                });
+            }
+        // end fix
+    },
+    
     onUpdated: function() {
         Ext.Msg.confirm(
             "Application Update",
