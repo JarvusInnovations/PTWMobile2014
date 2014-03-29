@@ -13,6 +13,9 @@ Ext.define('PTWMobile2014.model.Event', {
 			name: 'Status',
 			type: 'string'
 		}, {
+		    name: 'EventPhotoID',
+		    type: 'integer'
+        }, {
 			name: 'Title',
 			type: 'string'
 		}, {
@@ -29,7 +32,11 @@ Ext.define('PTWMobile2014.model.Event', {
 			type: 'date',
 			dateFormat: 'timestamp'
 		}, {
-			name: 'Address',
+		}, {
+		    name: 'LocationName',
+		    type: 'string'
+        }, {
+			name: 'LocationAddress',
 			type: 'string'
 		}, {
 			name: 'Description',
