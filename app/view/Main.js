@@ -36,6 +36,7 @@ Ext.define('PTWMobile2014.view.Main', {
                 xtype: 'list',
                 store: 'Schedule',
                 grouped: true,
+                flex: 1,
                 itemTpl: [
                     '<div class="event-time">',
                         '{[this.getShortTime(values.StartTime)]}',
