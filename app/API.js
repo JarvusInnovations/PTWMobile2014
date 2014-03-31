@@ -6,7 +6,7 @@ Ext.define('PTWMobile2014.API', {
 	],
 
 	config: {
-		baseUrl: 'http://ptw2014.clients01.jarv.us/'
+		baseUrl: PTWCONFIG.hostName
 	},
 
 	constructor: function() {
