@@ -1,11 +1,11 @@
 Ext.define('PTWMobile2014.controller.Schedule', {
 	extend: 'Ext.app.Controller',
-	requires: ['PTWMobile2014.API'],
+	requires: ['PTWMobile2014.API', 'Ext.SegmentedButton'],
 
 	config: {
 		calendarUpdateFrequency: window.calendarUpdateFrequency || 1, // # of seconds until cached calendar considered old
 		views: ['Main', 'Event'],
-		stores: ['Schedule'],
+		stores: ['Schedule', 'Bookmarks'],
 		refs: {
 			mainView: {
 				selector: 'mainview',
@@ -19,15 +19,27 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 				autoCreate: true,
 
 				xtype: 'eventview'
-			}
+			},
+			loginMessage: 'mainview #loginMessage',
+			segmentedButton: 'mainview segmentedbutton',
+			showAllButton: 'button[action=show-all]',
+			showBookmarksButton: 'button[action=show-bookmarks]'
 		},
 		control: {
 			eventList: {
 				activate: 'onEventListActivate',
 				select: 'onScheduleListSelect'
-			}
+			},
+			showAllButton: {
+				tap: 'onShowAllButtonTap'
+			},
+			showBookmarksButton: {
+				tap: 'onShowBookmarksButtonTap'
+			},
 		},
 		routes: {
+			'bookmarks': 'showBookmarks',
+			'events': 'showEvents',
 			'events/:eventId': {
 				action: 'showEvent',
 				conditions: {
@@ -71,6 +83,35 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 		} else {
 			me.loadSchedule();
 		}
+	},
+
+	loadBookmarks: function(callback, scope) {
+		var me = this,
+			mainView = me.getMainView();
+			bookmarkStore = Ext.getStore('Bookmarks');
+
+		mainView.setMasked({
+			xtype: 'loadmask',
+			message: 'Loading&hellip;'
+		});
+
+		PTWMobile2014.API.loadBookmarks(function(option, success, response) {
+			if(success) {
+				me.getEventList().show();
+				me.getLoginMessage().hide();
+
+				bookmarkStore.setData(response.data.data);
+			}
+			else if(response.data.loginRequired) {
+				me.getEventList().hide();
+				me.getLoginMessage().show();
+			}
+			mainView.setMasked(false);
+
+			if (callback) {
+				callback.call(scope);
+			}
+		});
 	},
 
 	loadSchedule: function() {
@@ -120,6 +161,16 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 		this.redirectTo(record);
 	},
 
+	showEvents: function() {
+		var me = this;
+
+		Ext.getStore('Schedule').clearFilter();
+		me.getSegmentedButton().setPressedButtons([me.getShowAllButton()]);
+		me.pushPath('events');
+		me.getLoginMessage().hide();
+		me.syncSchedule();
+	},
+
 	showEvent: function(eventId) {
 		var mainView = this.getMainView(),
 			eventView = this.getEventView(),
@@ -131,5 +182,45 @@ Ext.define('PTWMobile2014.controller.Schedule', {
 		eventView.setEvent(eventRecord);
 
 		mainView.push(eventView);
+	},
+
+	onShowAllButtonTap: function() {
+		this.pushPath('events');
+		this.getEventList().show();
+		this.getLoginMessage().hide();
+		Ext.getStore('Schedule').clearFilter();
+	},
+
+	onShowBookmarksButtonTap: function() {
+		this.showBookmarks();
+	},
+
+	showBookmarks: function() {
+		var me = this,
+			bookmarkStore = Ext.getStore('Bookmarks');
+
+		me.getSegmentedButton().setPressedButtons([me.getShowBookmarksButton()]);
+
+		me.pushPath('bookmarks');
+
+		if(!bookmarkStore.isLoaded()) {
+			me.loadBookmarks(function() { me.filterSchedule() });
+		}
+		else {
+			me.filterSchedule();
+		}
+	},
+
+	filterSchedule: function() {
+		var bookmarkStore = Ext.getStore('Bookmarks'),
+			scheduleStore = Ext.getStore('Schedule');
+
+		if(bookmarkStore.isLoaded() && scheduleStore.isLoaded()) {
+			scheduleStore.filter({
+				filterFn: function(item) {
+					return bookmarkStore.getById(item.get("Id")) != null;
+				}
+			});
+		}
 	}
 });

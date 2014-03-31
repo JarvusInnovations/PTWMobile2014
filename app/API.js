@@ -36,7 +36,6 @@ Ext.define('PTWMobile2014.API', {
 						response.data = Ext.decode(response.responseText, true);
 					}
 				} catch (error) {}
-
 				Ext.callback(callback, scope, [options, success, response]);
 			}
 		});
@@ -46,6 +45,10 @@ Ext.define('PTWMobile2014.API', {
 		var params = { updated_after: lastSync};
 
 		this.request('get', 'events/json', params, callback, scope);
+	},
+
+	loadBookmarks: function(callback, scope) {
+		this.request('get', 'bookmarks/json', {}, callback, scope);
 	},
 
 	onRequestException: function(connection, response, options) {
