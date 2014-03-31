@@ -4,9 +4,6 @@ Ext.define('PTWMobile2014.view.Event', {
 	requires: [
         'Jarvus.util.ExternalBrowser'
     ],
-	// mixins: [
-	// 	'Jarvus.ux.Pressable'
-	// ],
 
 	config: {
 		event: null,
