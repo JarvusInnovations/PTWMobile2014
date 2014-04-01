@@ -1,15 +1,18 @@
-$ptw-blue:   #05b3c1;
-$ptw-red:    #d15d44;
-$ptw-gray:   #919297;
-$ptw-gold:   #deb600;
-$ptw-green:  #81c734;
-$ptw-purple: #9b55be;
-$font-color: #1b4e61;
+$ptw-blue:     #05b3c1;
+$ptw-red:      #d15d44;
+$ptw-gray:     #919297;
+$ptw-gold:     #deb600;
+$ptw-green:    #81c734;
+$ptw-purple:   #9b55be;
+$ptw-darkblue: #1b4e61;
 
 $base-gradient: 'flat';
-$base-color: lighten($font-color, 10);
+$base-color: lighten($ptw-darkblue, 10);
 $active-color: $ptw-gold;
+$font-color: $ptw-darkblue;
 $font-family: 'Noto Sans', 'Avenir Next', sans-serif;
+
+$button-radius: 0;
 
 $list-color: $font-color;
 $list-header-bg-color: $ptw-green;
@@ -85,9 +88,55 @@ $list-pressed-color: $list-active-color;
     }
 }
 
+.main-view {
+    background: $ptw-darkblue;
+}
+
+.schedule-switcher {
+    margin: 0 .8em .8em;
+
+    .x-button {
+        background: rgba(white, .2);
+        
+        > .x-button-label {
+            font-size: small;
+        }
+        
+        &.x-button-pressing {
+            background: rgba(white, .4);
+        }
+
+        &.x-button-pressed {
+            background: white;
+            
+            > .x-button-label {
+                color: $font-color;
+            }
+        }
+    }
+}
+
 .x-navigationview-inner {
     > .x-layout-card-item {
         box-shadow: 0 0 3em rgba(black, .3);
+    }
+}
+
+.x-button-normal {
+    background: $base-color;
+    border: none;
+    
+    > .x-button-label {
+        color: white;
+        font-size: smaller;
+        font-weight: normal;
+        overflow: visible;
+        text-transform: uppercase;
+    }
+    
+    &.x-button-pressing,
+    &.x-button-pressed {
+        background: darken($base-color, 5);
     }
 }
 
@@ -157,6 +206,8 @@ $list-pressed-color: $list-active-color;
 }
 
 .event-details {
+    @include word-break(break-all);
+
     .event-header {
         background: #666 no-repeat center;
         background-size: cover;
@@ -201,6 +252,20 @@ $list-pressed-color: $list-active-color;
     .event-location {
         color: $ptw-blue;
         margin-bottom: 1.2em;
+    }
+}
+
+.login-message {
+    background: white;
+
+    .x-innerhtml {
+        color: #666;
+        text-align: center;
+    }
+    
+    .x-button {
+        margin: 0 .8em .8em;
+        min-height: 44px;
     }
 }
 
