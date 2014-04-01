@@ -13,20 +13,21 @@ Ext.define('PTWMobile2014.view.Main', {
         },
         items: [{
             xtype: 'container',
+            cls: 'main-view',
             layout: 'vbox',
             title: 'Schedule',
             items: [{
                 xtype: 'segmentedbutton',
-                layout: {
-                    pack: 'center',
-                    type: 'hbox'
+                cls: 'schedule-switcher',
+                defaults: {
+                    flex: 1
                 },
                 items: [{
                     text: 'All Events',
                     pressed: true,
                     action: 'show-all'
                 }, {
-                    text: 'Bookmarks',
+                    text: 'Bookmarked',
                     action: 'show-bookmarks'
                 }],
             }, {
@@ -69,11 +70,25 @@ Ext.define('PTWMobile2014.view.Main', {
                 ]
             }, {
                 xtype: 'container',
-                flex: 1,
-                styleHtmlContent: true,
+                cls: 'login-message',
                 itemId: 'loginMessage',
+                flex: 1,
                 hidden: true,
-                html: 'Please log-in to view your bookmarks. <a href="' + PTWCONFIG.hostName + 'login?return=/#bookmarks">Login</a>'
+                layout: {
+                    type: 'vbox',
+                    pack: 'center'
+                },
+                items: [{
+                    styleHtmlContent: true,
+                    html: 'Please log in to view your bookmarks.'
+                },{
+                    xtype: 'button',
+                    itemId: 'loginButton',
+                    text: 'Log In',
+                    handler: function() {
+                        location.href = PTWCONFIG.hostName + 'login?return=/#bookmarks';
+                    }
+                }]
             }]
         }]
     }
